@@ -1,0 +1,29 @@
+{
+	"dependencies": {
+		"@aptos-labs/ts-sdk": "^1.35.0",
+		"@langchain/core": "^0.3.39",
+		"@langchain/langgraph": "^0.2.46",
+		"@langchain/ollama": "^0.2.0",
+		"@lit-protocol/lit-node-client": "^7.0.6",
+		"@safe-global/protocol-kit": "^5.2.2",
+		"@safe-global/relay-kit": "^3.4.3",
+		"@safe-global/sdk-starter-kit": "^1.1.5",
+		"aptos": "^1.21.0",
+		"discord.js": "^14.18.0",
+		"dotenv": "^16.4.7",
+		"ethers": "^6.13.5",
+		"mysql": "^2.18.1",
+		"tsx": "^4.19.2",
+		"viem": "^2.23.1",
+		"zod": "^3.24.2"
+	},
+	"packageManager": "pnpm@10.2.1+sha512.398035c7bd696d0ba0b10a688ed558285329d27ea994804a52bad9167d8e3a72bcb993f9699585d3ca25779ac64949ef422757a6c31102c12ab932e5cbe5cc92",
+	"devDependencies": {
+		"@types/node": "^22.13.1"
+	},
+	"pnpm": {
+		"ignoredBuiltDependencies": [
+			"esbuild"
+		]
+	}
+}
