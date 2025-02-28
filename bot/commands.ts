@@ -64,7 +64,7 @@ const commands = [
             .setRequired(true)
     )
     .addStringOption(option =>
-      option.setName('proof')
+      option.setName('results')
         .setDescription('completed/failed')
         .setRequired(true)
         .addChoices(

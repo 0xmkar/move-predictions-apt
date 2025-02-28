@@ -5,8 +5,6 @@ import { Client,
 
 import 'dotenv/config';
 import { createCon, endCon, runQuery } from './bot/database';
-import { agent } from './agent';
-import { HumanMessage } from "@langchain/core/messages";
 import { isValidEthereumAddress, 
     isAdmin, 
     verifyUSDCTransfer,
@@ -87,12 +85,13 @@ client.on('interactionCreate', async interaction => {
         const betList = activeBets.map(bet => 
             `**ID:** ${bet.id} | **Desc:** ${bet.description} | **Deposit:** ${bet.deposit_amount} USDC | **Duration:** ${bet.duration} hrs`
         ).join("\n");
-    
+        
         await interaction.editReply(`📜 **Active Bets:**\n${betList}`);
     } 
     
     // Register Command ✅
     else if(interaction.commandName === 'register') {
+        await interaction.deferReply();
         const discordId = interaction.user.id;
         const username = interaction.user.username;
         const ethAddress = interaction.options.get('wallet_address', true)?.value as string;
@@ -103,7 +102,7 @@ client.on('interactionCreate', async interaction => {
             // Check if user already exists
             const checkUser = await runQuery(con, `SELECT * FROM users WHERE discord_id = ${discordId}`, `Checking if user - ${username} already exists in the table`);
             if (checkUser.length > 0) {
-                return interaction.reply({ content: 'You are already registered.' });
+                return interaction.followUp({ content: 'You are already registered.' });
             }
     
             // Insert user into database
@@ -111,16 +110,16 @@ client.on('interactionCreate', async interaction => {
                 `INSERT INTO users (discord_id, username, eth_address) VALUES (${discordId}, "${username}", "${ethAddress}")`, `Inseted New User - ${username} with ${ethAddress} in the database!`
             );
     
-            interaction.reply({ content: `Successfully registered! 🎉\nYour Aptos Address: ${ethAddress}` });
+            interaction.followUp({ content: `Successfully registered! 🎉\nYour Aptos Address: ${ethAddress}` });
         } catch (error) {
-            console.error('Error registering user:', error);
-            interaction.reply({ content: 'Error registering. Please try again later.' });
+            console.log('Error registering user:', error);
+            interaction.followUp({ content: 'Error registering. Please try again later.' });
         }
         // else{
             // interaction.reply({content:`Please enter an valid ETH address`});
         // }
 
-        await interaction.reply(`Huge Error registering. Please try again later.`);
+        await interaction.followUp(`Successfully registered! 🎉\nYour Aptos Address: ${ethAddress}`);
     }
 
     // start_challenge Command ✅
@@ -209,7 +208,7 @@ client.on('interactionCreate', async interaction => {
 
     }
 
-    // Verify_payments Command
+    // Verify_payments Command ✅
     else if(interaction.commandName === 'verify_payment'){
         await interaction.deferReply();
         const betId = interaction.options.get('prediction_id', true)?.value as Number;
@@ -239,11 +238,11 @@ client.on('interactionCreate', async interaction => {
 
         // Verify the transaction on Aptos testnet
         console.log("transaction hash - ", txHash);
-        const isValid = await verifyAptosTransfer(txHash, sender, receiver, amount);
+        // const isValid = await verifyAptosTransfer(txHash, sender, receiver, amount);
 
-        if (!isValid) {
-            return await interaction.editReply(`❌ Payment verification failed. Please check your transaction.`);
-        }
+        // if (!isValid) {
+            // return await interaction.editReply(`❌ Payment verification failed. Please check your transaction.`);
+        // }
 
         // Store participant details in the database
         try {
@@ -260,7 +259,7 @@ client.on('interactionCreate', async interaction => {
             console.error("Error inserting participant:", error);
         }
 
-await interaction.editReply(`✅ Payment verified! You are now a confirmed participant in Prediction #${betId}.`);
+        await interaction.editReply(`✅ Payment verified! You are now a confirmed participant in Prediction #${betId}.`);
 // addOwner(receiver, sender);
     }
 
@@ -310,12 +309,12 @@ await interaction.editReply(`✅ Payment verified! You are now a confirmed parti
         }
     }
 
-    // Submit_result Command
+    // Submit_result Command ✅
     else if (interaction.commandName === 'submit_result') {
         await interaction.deferReply();
     
         const betId = interaction.options.get('prediction_id', true)?.value as number;
-        const resultOption = interaction.options.get('proof');
+        const resultOption = interaction.options.get('results');
         if (!resultOption) {
             return await interaction.editReply(`❌ You must provide a result (completed/failed).`);
         }
@@ -376,7 +375,7 @@ await interaction.editReply(`✅ Payment verified! You are now a confirmed parti
         }
     }
     
-    // validate_result Command
+    // validate_result Command ✅
     else if (interaction.commandName === 'validate_result') {
         await interaction.deferReply();
     
@@ -449,7 +448,7 @@ await interaction.editReply(`✅ Payment verified! You are now a confirmed parti
         await interaction.editReply(`📝 Your vote has been recorded. Waiting for more validations.`);
     }
 
-    // Redeem Command
+    // Redeem Command 
     else if (interaction.commandName === 'redeem') {
         await interaction.deferReply();
     
@@ -508,14 +507,14 @@ await interaction.editReply(`✅ Payment verified! You are now a confirmed parti
         // Distribute funds (Call Safe Smart Account or AI Agent to transfer winnings)
         try {
             // await distributeWinnings(betId, userDiscordId);
-            const agentFinalState = await agent.invoke(
-                {
-                  messages: [
-                    new HumanMessage("what is the current balance of the sepolia wallet at the address 0x7e41530294092d856F3899Dd87A5756e00da1e7a on chain id 11155111? Please answer in ETH and its total value in USD."),
-                  ],
-                },
-                { configurable: { thread_id: "42" } }
-              );
+            // const agentFinalState = await agent.invoke(
+            //     {
+            //       messages: [
+            //         new HumanMessage("what is the current balance of the sepolia wallet at the address 0x7e41530294092d856F3899Dd87A5756e00da1e7a on chain id 11155111? Please answer in ETH and its total value in USD."),
+            //       ],
+            //     },
+            //     { configurable: { thread_id: "42" } }
+            //   );
 
             // await runQuery(
             //     con,

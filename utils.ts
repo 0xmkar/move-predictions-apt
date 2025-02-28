@@ -86,89 +86,54 @@ export const addOwner = async (safeAddress: string = "0x53b2b1795ed7C16C7956c86a
   console.log(await txResult);
 };
 
-
-import { AptosClient, Types } from "aptos";
-
-export async function verifyAptosTransfer(
-    txHash: string, 
-    sender: string, 
-    receiver: string, 
-    amount: number
-): Promise<boolean> {
-    try {
-        // Initialize Aptos client with testnet URL
-        const client = new AptosClient("https://testnet.aptoslabs.com");
-        
-        // Fetch transaction details
-        const txDetails = await client.getTransactionByHash(txHash);
-        
-        // Verify the transaction was successful
-        if (txDetails.success !== true) {
-            console.log("Transaction failed on chain");
-            return false;
-        }
-        
-        // Check if this is a user transaction
-        if (txDetails.type !== "user_transaction") {
-            console.log("Not a user transaction");
-            return false;
-        }
-
-        // For debugging - log the full transaction details
-        console.log("Transaction details:", JSON.stringify(txDetails, null, 2));
-        
-        // Access the payload correctly
-        const payload = txDetails.payload;
-        
-        // Check if it's an entry function payload
-        if (payload.type !== "entry_function_payload") {
-            console.log("Not an entry function payload");
-            return false;
-        }
-        
-        // Check if it's a coin transfer - the full function name includes module
-        // It should be something like "0x1::coin::transfer" or similar
-        const functionName = payload.function;
-        if (!functionName.includes("::coin::transfer")) {
-            console.log(`Not a coin transfer transaction. Function: ${functionName}`);
-            return false;
-        }
-        
-        // Verify sender address (already in the type check above, but double-checking)
-        if (txDetails.sender.toLowerCase() !== sender.toLowerCase()) {
-            console.log("Sender address mismatch");
-            return false;
-        }
-        
-        // Extract arguments from the payload
-        const args = payload.arguments;
-        if (args.length < 2) {
-            console.log("Invalid arguments in transaction");
-            return false;
-        }
-        
-        // The arguments format can vary based on the exact coin transfer function
-        // Let's log them to better understand their structure
-        console.log("Transaction arguments:", args);
-        
-        // You may need to adjust these checks based on the actual argument structure
-        // For the standard 0x1::coin::transfer function, the first argument is typically the recipient
-        if (args[0].toLowerCase() !== receiver.toLowerCase()) {
-            console.log(`Receiver address mismatch: expected ${receiver}, got ${args[0]}`);
-            return false;
-        }
-        
-        // And the second argument is typically the amount
-        const transferAmount = Number(args[1]);
-        if (transferAmount !== amount) {
-            console.log(`Amount mismatch: expected ${amount}, got ${transferAmount}`);
-            return false;
-        }
-        
-        // If all checks pass, return true
-        return true;
-    } catch (error) {
-        console.error("Error verifying Aptos transaction:", error);
-        return false;
+export async function verifyAptosTransfer(txHash, sender, receiver, amount) {
+  try {
+    // Fetch the transaction details from Aptos
+    const response = await fetch(`https://fullnode.testnet.aptoslabs.com/v1/transactions/by_hash/${txHash}`);
+    const txData = await response.json();
+    
+    // Check if it's a transaction and has the expected structure
+    if (!txData || !txData.type || txData.type !== 'user_transaction') {
+      console.log("Not a valid user transaction");
+      return false;
     }
+    
+    // For Aptos, we need to check if this is a coin transfer transaction
+    // Look for coin transfer in the payload or events
+    const isTransfer = txData.payload && 
+                       txData.payload.function === '0x1::coin::transfer' || 
+                       txData.payload.function === '0x1::aptos_account::transfer';
+    
+    if (!isTransfer) {
+      console.log("Not a coin transfer transaction");
+      return false;
+    }
+    
+    // Verify sender address matches
+    if (txData.sender.toLowerCase() !== sender.toLowerCase()) {
+      console.log("Sender doesn't match");
+      return false;
+    }
+    
+    // Verify amount and receiver from payload arguments
+    const args = txData.payload.arguments;
+    // Check if receiver and amount match expected values
+    // Note: Format might need adjustment based on actual Aptos payload structure
+    if (args[0].toLowerCase() !== receiver.toLowerCase() || 
+        parseFloat(args[1]) !== parseFloat(amount)) {
+      console.log("Receiver or amount doesn't match");
+      return false;
+    }
+    
+    // Verify transaction status
+    if (txData.vm_status !== 'Executed successfully') {
+      console.log("Transaction not successful");
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error verifying Aptos transfer:", error);
+    return false;
+  }
 }
