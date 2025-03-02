@@ -1,0 +1,18 @@
+[package]
+name = "verify-multi-sign-01"
+version = "1.0.0"
+authors = []
+
+[addresses]
+owner = "9b1a90fa877964092ba05890fcb1998a3426b72f3bface15d336b6388cae2cf7"
+addr1 = "a0caacac270562c54f605b8dbba73eb4d1e9ef2d5ec7ac497fc0e6ef023ca2a7"
+addr2 = "cce08d4128d678093cf0538659ab142679ecb6180cc9cbd4250b6b810ad2f69e"
+
+[dev-addresses]
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = "mainnet"
+subdir = "aptos-move/framework/aptos-framework"
+
+[dev-dependencies]
