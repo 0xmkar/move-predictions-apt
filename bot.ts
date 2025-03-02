@@ -86,7 +86,7 @@ client.on('interactionCreate', async interaction => {
             `**ID:** ${bet.id} | **Desc:** ${bet.description} | **Deposit:** ${bet.deposit_amount} USDC | **Duration:** ${bet.duration} hrs`
         ).join("\n");
         
-        await interaction.editReply(`📜 **Active Bets:**\n${betList}`);
+        await interaction.editReply(`📜 **Active Predictions:**\n${betList}`);
     } 
     
     // Register Command ✅
@@ -191,11 +191,11 @@ client.on('interactionCreate', async interaction => {
         const betData = await runQuery(con, `SELECT * FROM bets WHERE id = ${betId} LIMIT 1`, ``);
 
         if (betData.length === 0) {
-            return await interaction.editReply(`❌ challenge with ID ${betId} not found.`);
+            return await interaction.editReply(`❌ prediction with ID ${betId} not found.`);
         }
         const bet = betData[0];
 
-        const betInfo = `**Bet Details (ID: ${bet.id})**\n
+        const betInfo = `**Prediction Details (ID: ${bet.id})**\n
         **Description:** ${bet.description}
         **Creator:** <@${bet.creator_discord_id}>
         **Deposit Amount:** ${bet.deposit_amount} USDC
@@ -278,19 +278,19 @@ client.on('interactionCreate', async interaction => {
         );
     
         if (betData.length === 0) {
-            return await interaction.editReply(`❌ Bet with ID ${betId} not found.`);
+            return await interaction.editReply(`❌ Prediction with ID ${betId} not found.`);
         }
     
         const { creator_discord_id, status } = betData[0];
     
         // Check if the user is the creator
         if (creator_discord_id !== userDiscordId) {
-            return await interaction.editReply(`❌ Only the creator of the bet can end it.`);
+            return await interaction.editReply(`❌ Only the creator of the prediction can end it.`);
         }
     
         // Check if the bet is already ended
         if (status === 'ended') {
-            return await interaction.editReply(`⚠️ This bet has already been ended.`);
+            return await interaction.editReply(`⚠️ This Prediction has already been ended.`);
         }
     
         // Update the bet status to 'ended'
@@ -301,11 +301,11 @@ client.on('interactionCreate', async interaction => {
                 `Ending the challenge...`
             );
     
-            console.log(`Bet #${betId} has been ended.`);
-            await interaction.editReply(`✅ Bet #${betId} has been successfully ended.`);            
+            console.log(`Prediction #${betId} has been ended.`);
+            await interaction.editReply(`✅ Prediction #${betId} has been successfully ended.`);            
         } catch (error) {
-            console.error("Error ending the challenge:", error);
-            await interaction.editReply(`❌ Failed to end the challenge. Please try again.`);
+            console.error("Error ending the prediction:", error);
+            await interaction.editReply(`❌ Failed to end the Prediction. Please try again.`);
         }
     }
 
