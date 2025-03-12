@@ -39,20 +39,20 @@ A **lightweight, social prediction market** Discord bot powered by **Move smart 
 ## 📦 Installation & Setup
 
 ### 1️⃣ Clone the Repository
-sh
-git clone https://github.com/your-username/MoveCast.git
+```sh
+git clone https://github.com/0xmkar/MoveCast.git
 cd MoveCast
-
+```
 
 ### 2️⃣ Install Dependencies
-sh
+```sh
 npm install
-
+```
 
 ### 4️⃣ Run the Bot
-sh
+```sh
 node index.js
-
+```
 
 ---
 
