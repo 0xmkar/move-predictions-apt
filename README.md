@@ -85,11 +85,3 @@ node index.js
 This project is licensed under the **MIT License**. Feel free to use and improve it!
 
 ---
-
-## 🤝 Contributing
-
-🚀 Fork the repository.  
-🛠 Create a new branch (`git checkout -b feature-name`).  
-✨ Make changes & commit (`git commit -m "Added awesome feature"`).  
-🔄 Push to GitHub (`git push origin feature-name`).  
-🎉 Create a **Pull Request**.  
